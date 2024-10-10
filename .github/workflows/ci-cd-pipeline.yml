@@ -32,25 +32,32 @@ jobs:
 
     # Step 4: Build the Docker image using the repository name and commit hash as the tag
     - name: Build Docker image
-      run: docker build -t ${{ github.repository }}:${{ github.sha }} .
-      # Builds the Docker image using the current repository name and commit hash as the tag
+      run: |
+        REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+        docker build -t $REPO_NAME:${{ github.sha }} .
+      # Converts the repository name to lowercase and builds the Docker image using the lowercase repository name and commit hash as the tag
 
     # Step 5: Tag the Docker image with the Amazon ECR repository path
     - name: Tag Docker image
-      run: docker tag ${{ github.repository }}:${{ github.sha }} $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${{ github.repository }}:${{ github.sha }}
-      # Tags the image with the Amazon ECR path to prepare for pushing
+      run: |
+        REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+        docker tag $REPO_NAME:${{ github.sha }} $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_NAME:${{ github.sha }}
+      # Converts the repository name to lowercase and tags the image with the Amazon ECR path to prepare for pushing
 
     # Step 6: Push the Docker image to Amazon ECR
     - name: Push Docker image to Amazon ECR
-      run: docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${{ github.repository }}:${{ github.sha }}
-      # Pushes the tagged Docker image to your Amazon ECR repository
+      run: |
+        REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+        docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_NAME:${{ github.sha }}
+      # Converts the repository name to lowercase and pushes the tagged Docker image to your Amazon ECR repository
 
     # Step 7: Update the AWS Lambda function to use the new Docker image
     - name: Update Lambda function
       env:
         AWS_REGION: ${{ secrets.AWS_REGION }}  # Use your AWS Region from GitHub Secrets
       run: |
+        REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
         aws lambda update-function-code \
           --function-name your-lambda-function-name \  # Replace 'your-lambda-function-name' with your actual Lambda function name
-          --image-uri $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${{ github.repository }}:${{ github.sha }}
-      # Updates the AWS Lambda function to use the new Docker image from Amazon ECR
+          --image-uri $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_NAME:${{ github.sha }}
+      # Converts the repository name to lowercase and updates the AWS Lambda function to use the new Docker image from Amazon ECR
