@@ -46,21 +46,19 @@ jobs:
     - name: Tag Docker image
       run: |
         REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-        docker tag $REPO_NAME:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$REPO_NAME:${{ github.sha }}
-      # Converts the repository name to lowercase and tags the image with the Amazon ECR path to prepare for pushing
+        docker tag $REPO_NAME:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-lambda-function:${{ github.sha }}
+      # Tags the image with the Amazon ECR path using the repository name 'my-lambda-function'
 
     # Step 7: Push the Docker image to Amazon ECR
     - name: Push Docker image to Amazon ECR
       run: |
-        REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$REPO_NAME:${{ github.sha }}
-      # Converts the repository name to lowercase and pushes the tagged Docker image to your Amazon ECR repository
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-lambda-function:${{ github.sha }}
+      # Pushes the tagged Docker image to your Amazon ECR repository named 'my-lambda-function'
 
     # Step 8: Update the AWS Lambda function to use the new Docker image
     - name: Update Lambda function
       run: |
-        REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
         aws lambda update-function-code \
           --function-name my-lambda-function \  # Replace with your actual Lambda function name
-          --image-uri ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$REPO_NAME:${{ github.sha }}
-      # Converts the repository name to lowercase and updates the AWS Lambda function to use the new Docker image from Amazon ECR
+          --image-uri ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-lambda-function:${{ github.sha }}
+      # Updates the AWS Lambda function to use the new Docker image from the ECR repository 'my-lambda-function'
