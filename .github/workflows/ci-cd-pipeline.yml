@@ -58,7 +58,5 @@ jobs:
     # Step 8: Update the AWS Lambda function to use the new Docker image
     - name: Update Lambda function
       run: |
-        aws lambda update-function-code \
-          --function-name my-lambda-function \  # Replace with your actual Lambda function name
-          --image-uri ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-lambda-function:${{ github.sha }}
+        aws lambda update-function-code --function-name my-lambda-function --image-uri ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-lambda-function:${{ github.sha }}
       # Updates the AWS Lambda function to use the new Docker image from the ECR repository 'my-lambda-function'
