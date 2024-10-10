@@ -19,38 +19,48 @@ jobs:
     - name: Set up Docker
       uses: docker/setup-buildx-action@v3  # Prepares the Docker environment for building images
 
-    # Step 3: Login to Amazon ECR using the AWS CLI
+    # Step 3: Set AWS Credentials Environment Variables
+    - name: Configure AWS Credentials
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: echo "AWS credentials configured."
+
+    # Step 4: Login to Amazon ECR using the AWS CLI
     - name: Login to Amazon ECR
       run: |
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws configure set region ${{ secrets.AWS_REGION }}
         aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
       # Logs into Amazon ECR using the AWS CLI and credentials stored in GitHub Secrets
 
-    # Step 4: Build the Docker image using the repository name and commit hash as the tag
+    # Step 5: Build the Docker image using the repository name and commit hash as the tag
     - name: Build Docker image
       run: |
         REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
         docker build -t $REPO_NAME:${{ github.sha }} .
       # Converts the repository name to lowercase and builds the Docker image using the lowercase repository name and commit hash as the tag
 
-    # Step 5: Tag the Docker image with the Amazon ECR repository path
+    # Step 6: Tag the Docker image with the Amazon ECR repository path
     - name: Tag Docker image
       run: |
         REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
         docker tag $REPO_NAME:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$REPO_NAME:${{ github.sha }}
       # Converts the repository name to lowercase and tags the image with the Amazon ECR path to prepare for pushing
 
-    # Step 6: Push the Docker image to Amazon ECR
+    # Step 7: Push the Docker image to Amazon ECR
     - name: Push Docker image to Amazon ECR
       run: |
         REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$REPO_NAME:${{ github.sha }}
       # Converts the repository name to lowercase and pushes the tagged Docker image to your Amazon ECR repository
 
-    # Step 7: Update the AWS Lambda function to use the new Docker image
+    # Step 8: Update the AWS Lambda function to use the new Docker image
     - name: Update Lambda function
       run: |
         REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
         aws lambda update-function-code \
-          --function-name my-lambda-function \ 
+          --function-name my-lambda-function \  # Replace with your actual Lambda function name
           --image-uri ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$REPO_NAME:${{ github.sha }}
       # Converts the repository name to lowercase and updates the AWS Lambda function to use the new Docker image from Amazon ECR
