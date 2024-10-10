@@ -1,3 +1,3 @@
 # aws-serverless-ecom-platform-functions
 
-test CI/CD pipline 5
+test CI/CD pipline 6
