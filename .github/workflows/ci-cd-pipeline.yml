@@ -25,6 +25,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS Access Key ID from GitHub Secrets
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS Secret Access Key from GitHub Secrets
         AWS_REGION: ${{ secrets.AWS_REGION }}  # AWS Region from GitHub Secrets
+        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}  # AWS Account ID from GitHub Secrets
       run: |
         aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
       # Logs into Amazon ECR using the AWS CLI and credentials stored in GitHub Secrets
