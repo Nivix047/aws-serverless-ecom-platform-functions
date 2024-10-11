@@ -4,7 +4,8 @@
 
 The purpose of this project is to build a serverless application using AWS, designed to be cost-effective and scalable for small applications. The core components include:
 
-- **Amazon RDS**: A PostgreSQL database hosted on AWS RDS, handled in a separate repository.
+- **Amazon RDS**: A PostgreSQL database hosted on AWS RDS, handled in a separate repository. For more details on the database setup, you can access the RDS repository here:
+  - **[AWS RDS Database Repository](https://github.com/Nivix047/aws-serverless-ecom-platform-db)**
 - **AWS Lambda**: CRUD functions containerized using Docker and managed via AWS ECR.
 - **AWS API Gateway**: Exposing the Lambda functions as API endpoints to interact with the application.
 
@@ -42,13 +43,7 @@ The project setup leverages modern cloud tools to create a serverless architectu
 
 Below is an example of a successful API call to the Lambda function using AWS API Gateway, demonstrating a CRUD operation.
 
-(![Screenshot 2024-10-10 at 7 30 29 PM](https://github.com/user-attachments/assets/bfb620d2-7249-41a7-81c8-91828b0bc5a9))
-
-## Separate Repository for RDS Database
-
-The Amazon RDS PostgreSQL database setup is managed in a separate repository. For a detailed explanation and setup instructions, you can access the RDS repository here:
-
-- **[AWS RDS Database Repository](https://github.com/Nivix047/aws-serverless-ecom-platform-db)**
+![API Call Example](https://github.com/user-attachments/assets/bfb620d2-7249-41a7-81c8-91828b0bc5a9)
 
 ## Key Technologies Used
 
